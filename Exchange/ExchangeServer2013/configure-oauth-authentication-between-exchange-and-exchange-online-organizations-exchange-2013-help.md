@@ -55,7 +55,7 @@ Run the following command in the Exchange Management Shell (Exchange PowerShell)
 
 ```powershell
 New-AuthServer -Name "WindowsAzureACS" -AuthMetadataUrl "https://accounts.accesscontrol.windows.net/<your verified domain>/metadata/json/1"
-New-AuthServer -Name "evoSTS" -Type AzureAD -AuthMetadataUrl "https://login.windows.net/<your tenant domain>/federationmetadata/2007-06/federationmetadata.xml"
+New-AuthServer -Name "evoSTS" -Type AzureAD -AuthMetadataUrl "https://login.windows.net/<your tenant domain >.onmicrosoft.com/federationmetadata/2007-06/federationmetadata.xml"
 ```
 
 ### Step 2: Enable the partner application for your Exchange Online organization
@@ -224,6 +224,8 @@ To configure the *AvailabilityAddressSpace*, use Exchange PowerShell and run the
 ```powershell
 Add-AvailabilityAddressSpace -AccessMethod InternalProxy -ProxyUrl <your on-premises External Web Services URL> -ForestName <your Office 365 service target address> -UseServiceAccount $True
 ```
+> [!NOTE]
+> if you have already setup the Hybrid of Exchange, you don't need to add the AvailabilityAddressSpace.
 
 ## How do you know this worked?
 
@@ -235,16 +237,20 @@ You can verify that the OAuth configuration is correct by using the [Test-OAuthC
 To verify that your on-premises Exchange organization can successfully connect to Exchange Online, run the following command in Exchange PowerShell in your on-premises organization:
 
 ```powershell
-Test-OAuthConnectivity -Service EWS -TargetUri https://outlook.office365.com/ews/exchange.asmx -Mailbox <On-Premises Mailbox> -Verbose | Format-List
+Test-OAuthConnectivity -Service EWS -TargetUri https://outlook.office365.com/ews/exchange.asmx -Mailbox '<On-Premises Mailbox>' -Verbose | fl
+Test-OAuthConnectivity -Service AutoD  -TargetUri https://autodiscover-s.outlook.com/autodiscover/autodiscover.svc -Mailbox '<On-Premises Mailbox>' -Verbose | fl
+
 ```
 
 To verify that your Exchange Online organization can successfully connect to your on-premises Exchange organization, use the [Remote PowerShell](https://technet.microsoft.com/library/jj984289\(v=exchg.150\)) to connect to your Exchange Online organization and run the following command:
 
 ```powershell
-Test-OAuthConnectivity -Service EWS -TargetUri <external hostname authority of your Exchange On-Premises deployment>/metadata/json/1 -Mailbox <Exchange Online Mailbox> -Verbose | Format-List
+Test-OAuthConnectivity -Service EWS -TargetUri "<OnPremises External EWSurl: https://mail.domain.com/ews/exchange.asmx>" -Mailbox "<Exchange Online Mailbox>" -Verbose | fl
+Test-OAuthConnectivity -Service AutoD -TargetUri "<OnPremises Autodiscover.svc endpoint: https://mail.domain.com/autodiscover/autodiscover.svc>" -Mailbox "<Exchange Online Mailbox>" -Verbose | fl
+
 ```
 
-So, as an example, Test-OAuthConnectivity -Service EWS -TargetUri https://mail.contoso.com/metadata/json/1 -Mailbox ExchangeOnlineBox1 -Verbose | Format-List
+So, as an example, Test-OAuthConnectivity -Service EWS -TargetUri https://mail.contoso.com/ews/exchange.asmx -Mailbox ExchangeOnlineBox1 -Verbose | Format-List
 
 > [!IMPORTANT]
 > You can ignore the "The SMTP address has no mailbox associated with it." error. It's only important that the <EM>ResultTask</EM> parameter returns a value of <STRONG>Success</STRONG>. For example, the last section of the test output should read:<BR><CODE>ResultType: Success</CODE><BR><CODE>Identity: Microsoft.Exchange.Security.OAuth.ValidationResultNodeId</CODE><BR><CODE>IsValid: True</CODE><BR><CODE>ObjectState: New</CODE>
