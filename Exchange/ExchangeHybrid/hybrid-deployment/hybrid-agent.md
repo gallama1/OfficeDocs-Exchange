@@ -99,6 +99,9 @@ Keep the following issues in mind before you install the Hybrid Agent:
 
 - The Hybrid Agent supports a single migration endpoint with the service default limits. Multiple migration endpoints utilizing your custom endpoint/URL is not supported.
 
+- The Hybrid Agent supports only a single Exchange forest. For Hybrid deployments with multiple forests use the Classic Hybrid Tecnology.
+
+
 > [!NOTE]
 > SMTP doesn't traverse the Hybrid Agent and still requires a public certificate for mail flow between Microsoft 365 or Office 365 and your on-premises organization. SMTP traffic is out of scope for the Hybrid Agent.
 
